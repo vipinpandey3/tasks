@@ -9,8 +9,8 @@ const {
 const user_controller = {
     create_taks: async(req, res) => {
         try {
-            console.log("req.user", req.user)
-            let reqBody = req.body;
+            console.log("req.user", req.body)
+            let reqBody = req.query;
             let reqUser = req.user;
             let result = await create_taks(reqBody, reqUser);
             if(!result.status) {
@@ -58,9 +58,10 @@ const user_controller = {
 
     update_tasks: async(req, res) => {
         try {
+            console.log("req.body", req.body)
             let reqBody = {
                 task_id: req.params.task_id,
-                ...req.body
+                ...req.query
             }
             let reqUser = req.user;
             let result = await update_task_status(reqBody, reqUser);

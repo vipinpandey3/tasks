@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "jest --detectOpenHandles --verbose",
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "start-cron": "nodemon cron.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -17,10 +18,12 @@
     "faker": "^5.5.3",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.9.7",
+    "node-cron": "^3.0.3",
     "passport": "^0.7.0",
     "passport-custom": "^1.1.1",
     "passport-jwt": "^4.0.1",
-    "sequelize": "^6.37.3"
+    "sequelize": "^6.37.3",
+    "socket.io": "^4.7.5"
   },
   "devDependencies": {
     "jest": "^29.7.0",

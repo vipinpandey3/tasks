@@ -100,6 +100,10 @@ const user_service = {
                         {
                             "title": "Status",
                             "dataIndex": "status"
+                        },
+                        {
+                            "title": "Due Date",
+                            "dataIndex": "dueDate"
                         }
                     ]
                 }
