@@ -6,7 +6,7 @@ import moment from 'moment';
 import UserContainer from '../../container/user';
 import TasksForm from '../../component_form/task_forms/task_creation_form';
 import * as antd from 'antd';
-import {FormateDate, getCurrentDate} from "../../helper/date_helper"
+import { FormateDate, getCurrentDate } from "../../helper/date_helper";
 
 class TaskComponent extends React.Component {
   constructor(props) {
@@ -23,7 +23,7 @@ class TaskComponent extends React.Component {
         status: 'To Do',
         dueDate: getCurrentDate()
       },
-      filter: { limit: 10, offset: 0, status: ["To Do", "In Progress", "Done"] },
+      filter: { limit: 10, offset: 0, status: '', dueDate: null },
       showDialogueBox: false,
       tableParams: {
         pagination: {
@@ -39,6 +39,10 @@ class TaskComponent extends React.Component {
     this.on_finish = this.on_finish.bind(this);
     this.create_task = this.create_task.bind(this);
     this.update_task = this.update_task.bind(this);
+    this.handleFilterChange = this.handleFilterChange.bind(this);
+    this.handleFilterSubmit = this.handleFilterSubmit.bind(this);
+    this.handleClearFilter = this.handleClearFilter.bind(this);
+    this.handleTableChange = this.handleTableChange.bind(this);
   }
 
   componentDidMount() {
@@ -69,6 +73,16 @@ class TaskComponent extends React.Component {
     this.props.app_action.api_generic_get(opts, (result) => {
       if (result.data.resultShort === 'success') {
         console.log('result.data', result.data);
+        this.setState({
+          taskList: result.data.data.tasks,
+          tableParams: {
+            ...this.state.tableParams,
+            pagination: {
+              ...this.state.tableParams.pagination,
+              total: result.data.data.totalCount,
+            },
+          },
+        });
       }
     });
   }
@@ -122,8 +136,8 @@ class TaskComponent extends React.Component {
   }
 
   on_finish(value) {
-    let dueDate = FormateDate(value.dueDate)
-    value.dueDate = dueDate
+    let dueDate = FormateDate(value.dueDate);
+    value.dueDate = dueDate;
     if (this.state.is_task_updating) {
       this.update_task(value);
     } else {
@@ -149,7 +163,6 @@ class TaskComponent extends React.Component {
   };
 
   handleDelete = (record) => {
-
     const opts = {
       event: constant_helper.get_app_constant().API_CREATE_TASKS,
       endpoint: `user/update_task_status/${record.key}`,
@@ -166,6 +179,54 @@ class TaskComponent extends React.Component {
         this.load_tasks(this.state.filter);
       }
     });
+  };
+
+  handleFilterChange = (changedValues, allValues) => {
+    this.set_state('filter', allValues);
+  };
+
+  handleFilterSubmit = () => {
+    const { filter, tableParams } = this.state;
+    const filterValues = {
+      status: filter.status,
+      dueDate: filter.dueDate ? moment(filter.dueDate).format('YYYY-MM-DD') : null,
+    };
+    this.load_tasks({
+      ...filterValues,
+      limit: tableParams.pagination.pageSize,
+      offset: (tableParams.pagination.current - 1) * tableParams.pagination.pageSize,
+    });
+  };
+
+  handleClearFilter = () => {
+    this.setState({
+      filter: { limit: 10, offset: 0, status: '', dueDate: null },
+      tableParams: {
+        pagination: {
+          current: 1,
+          pageSize: 10,
+        },
+      },
+    }, () => {
+      this.load_tasks(this.state.filter);
+    });
+  };
+
+  handleTableChange = (pagination) => {
+    this.set_state('tableParams', { pagination });
+    this.load_tasks({
+      ...this.getCurrentParams(),
+      limit: pagination.pageSize,
+      offset: (pagination.current - 1) * pagination.pageSize,
+    });
+  };
+
+  getCurrentParams = () => {
+    const { filter } = this.state;
+    return {
+      status: filter.status,
+      dueDate: filter.dueDate ? moment(filter.dueDate).format('YYYY-MM-DD') : null,
+    };
   };
 
   rowClassName = (record) => {
@@ -238,6 +299,32 @@ class TaskComponent extends React.Component {
     return (
       <div style={{ width: '80%', margin: '0 auto' }}>
         <UserContainer {...this.props} />
+        {
+          !this.state.show_task_creation_form && 
+          <antd.Form style={{marginTop: "10px"}} layout="inline" onValuesChange={this.handleFilterChange}>
+          <antd.Form.Item label="Status" name="status">
+            <antd.Select style={{ width: 120 }}>
+              <antd.Select.Option value="">All</antd.Select.Option>
+              <antd.Select.Option value="To Do">To Do</antd.Select.Option>
+              <antd.Select.Option value="In Progress">In Progress</antd.Select.Option>
+              <antd.Select.Option value="Done">Done</antd.Select.Option>
+            </antd.Select>
+          </antd.Form.Item>
+          <antd.Form.Item label="Due Date" name="dueDate">
+            <antd.DatePicker format="YYYY-MM-DD" />
+          </antd.Form.Item>
+          <antd.Form.Item>
+            <antd.Button type="primary" onClick={this.handleFilterSubmit}>
+              Filter
+            </antd.Button>
+          </antd.Form.Item>
+          <antd.Form.Item>
+            <antd.Button type="default" onClick={this.handleClearFilter}>
+              Clear Filter
+            </antd.Button>
+          </antd.Form.Item>
+        </antd.Form>
+        }
         {this.state.show_task_creation_form && (
           <TasksForm formValue={this.state.formValue} on_finish={this.on_finish} state={this.state} />
         )}
@@ -256,7 +343,8 @@ class TaskComponent extends React.Component {
             dataSource={dataSource}
             pagination={this.state.tableParams.pagination}
             loading={this.state.loading}
-            rowClassName={this.rowClassName} // Add rowClassName property
+            rowClassName={this.rowClassName}
+            onChange={this.handleTableChange}
           />
         </div>
       </div>
