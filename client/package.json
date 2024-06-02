@@ -10,6 +10,7 @@
     "axios": "^1.6.8",
     "buffer": "^6.0.3",
     "copy-to-clipboard": "^3.3.3",
+    "dayjs": "^1.11.11",
     "framer-motion": "^11.0.14",
     "isnumeric": "^0.3.3",
     "lodash": "^4.17.21",

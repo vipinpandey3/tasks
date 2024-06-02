@@ -6,6 +6,7 @@ import moment from 'moment';
 import UserContainer from '../../container/user';
 import TasksForm from '../../component_form/task_forms/task_creation_form';
 import * as antd from 'antd';
+import {FormateDate, getCurrentDate} from "../../helper/date_helper"
 
 class TaskComponent extends React.Component {
   constructor(props) {
@@ -20,7 +21,7 @@ class TaskComponent extends React.Component {
         title: '',
         description: '',
         status: 'To Do',
-        dueDate: moment().format('YYYY-MM-DD')
+        dueDate: getCurrentDate()
       },
       filter: { limit: 10, offset: 0, status: ["To Do", "In Progress", "Done"] },
       showDialogueBox: false,
@@ -73,8 +74,6 @@ class TaskComponent extends React.Component {
   }
 
   create_task(value) {
-    console.log("value.dueDate", value)
-    value.dueDate = value.dueDate ? moment(value.dueDate).format('YYYY-MM-DD HH:mm:ss') : null;
     const opts = {
       event: constant_helper.get_app_constant().API_CREATE_TASKS,
       endpoint: 'user/create-task',
@@ -123,6 +122,8 @@ class TaskComponent extends React.Component {
   }
 
   on_finish(value) {
+    let dueDate = FormateDate(value.dueDate)
+    value.dueDate = dueDate
     if (this.state.is_task_updating) {
       this.update_task(value);
     } else {
@@ -131,12 +132,10 @@ class TaskComponent extends React.Component {
   }
 
   onSelectChange = (newSelectedRowKeys) => {
-    console.log('selectedRowKeys changed: ', newSelectedRowKeys);
     this.setState({ selectedRowKeys: newSelectedRowKeys });
   };
 
   handleEdit = (record) => {
-    console.log('record', record);
     this.setState({
       ...this.state,
       show_task_creation_form: true,

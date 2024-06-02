@@ -4,12 +4,12 @@ import moment from 'moment';
 
 const TasksForm = ({ formValue, on_finish, state }) => {
   const [form] = Form.useForm();
-  useEffect(() => {
-    form.setFieldsValue({
-      ...formValue,
-      dueDate: formValue.dueDate ? moment(formValue.dueDate) : null,
-    });
-  }, [formValue]);
+  // useEffect(() => {
+  //   form.setFieldsValue({
+  //     ...formValue,
+  //     dueDate: formValue.dueDate ? moment(formValue.dueDate) : null,
+  //   });
+  // }, [formValue]);
 
   return (
     <Form
@@ -18,7 +18,7 @@ const TasksForm = ({ formValue, on_finish, state }) => {
       onFinish={on_finish}
       initialValues={{
         ...formValue,
-        dueDate: formValue.dueDate ? moment(formValue.dueDate) : null,
+        dueDate:  null,
       }}
       style={{ width: '100%' }}
     >
