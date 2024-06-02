@@ -42,6 +42,7 @@ class TaskComponent extends React.Component {
     this.handleFilterChange = this.handleFilterChange.bind(this);
     this.handleFilterSubmit = this.handleFilterSubmit.bind(this);
     this.handleClearFilter = this.handleClearFilter.bind(this);
+    this.handle_cancel = this.handle_cancel.bind(this);
     this.handleTableChange = this.handleTableChange.bind(this);
   }
 
@@ -212,6 +213,20 @@ class TaskComponent extends React.Component {
     });
   };
 
+  handle_cancel = () => {
+    this.setState({
+      show_task_creation_form: false,
+      is_task_updating: false,
+      formValue: {
+        title: '',
+        description: '',
+        status: 'To Do',
+        dueDate: getCurrentDate()
+      },
+      task_id: null,
+    });
+  };
+
   handleTableChange = (pagination) => {
     this.set_state('tableParams', { pagination });
     this.load_tasks({
@@ -301,7 +316,7 @@ class TaskComponent extends React.Component {
         <UserContainer {...this.props} />
         {
           !this.state.show_task_creation_form && 
-          <antd.Form style={{marginTop: "10px"}} layout="inline" onValuesChange={this.handleFilterChange}>
+          <antd.Form style={{marginTop: '10px'}} layout="inline" onValuesChange={this.handleFilterChange}>
           <antd.Form.Item label="Status" name="status">
             <antd.Select style={{ width: 120 }}>
               <antd.Select.Option value="">All</antd.Select.Option>
@@ -326,7 +341,7 @@ class TaskComponent extends React.Component {
         </antd.Form>
         }
         {this.state.show_task_creation_form && (
-          <TasksForm formValue={this.state.formValue} on_finish={this.on_finish} state={this.state} />
+          <TasksForm formValue={this.state.formValue} on_finish={this.on_finish} on_cancel={this.handle_cancel} />
         )}
         {!this.state.show_task_creation_form && (
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px', marginTop: '10px' }}>
@@ -343,8 +358,8 @@ class TaskComponent extends React.Component {
             dataSource={dataSource}
             pagination={this.state.tableParams.pagination}
             loading={this.state.loading}
-            rowClassName={this.rowClassName}
-            onChange={this.handleTableChange}
+            rowClassName={this.rowClassName} // Add rowClassName property
+            onChange={this.handleTableChange} // Handle pagination change
           />
         </div>
       </div>

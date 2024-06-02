@@ -2,14 +2,15 @@ import React, { useEffect } from 'react';
 import { Form, Input, Button, DatePicker, Select, Row, Col } from 'antd';
 import moment from 'moment';
 
-const TasksForm = ({ formValue, on_finish, state }) => {
+const TasksForm = ({ formValue, on_finish, on_cancel }) => {
   const [form] = Form.useForm();
-  // useEffect(() => {
-  //   form.setFieldsValue({
-  //     ...formValue,
-  //     dueDate: formValue.dueDate ? moment(formValue.dueDate) : null,
-  //   });
-  // }, [formValue]);
+  
+  useEffect(() => {
+    form.setFieldsValue({
+      ...formValue,
+      dueDate: formValue.dueDate ? moment(formValue.dueDate) : null,
+    });
+  }, [formValue]);
 
   return (
     <Form
@@ -18,7 +19,7 @@ const TasksForm = ({ formValue, on_finish, state }) => {
       onFinish={on_finish}
       initialValues={{
         ...formValue,
-        dueDate:  null,
+        dueDate: formValue.dueDate ? moment(formValue.dueDate) : null,
       }}
       style={{ width: '100%' }}
     >
@@ -80,7 +81,14 @@ const TasksForm = ({ formValue, on_finish, state }) => {
           </Form.Item>
         </Col>
       </Row>
-      <Button type="primary" htmlType="submit">Create Task</Button>
+      <Form.Item>
+        <Button type="primary" htmlType="submit" style={{ marginRight: 8 }}>
+          Create Task
+        </Button>
+        <Button type="default" onClick={on_cancel}>
+          Cancel
+        </Button>
+      </Form.Item>
     </Form>
   );
 };
