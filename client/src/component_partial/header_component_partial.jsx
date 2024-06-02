@@ -5,8 +5,8 @@ import prop_types from "prop-types";
 
 import * as antd from "antd";
 
-// import collection_helper from "../helper/collection_helper";
-// import constant_helper from "../helper/constant_helper";
+import collection_helper from "../helper/collection_helper";
+import constant_helper from "../helper/constant_helper";
 
 const properties = {
 	header: prop_types.object.isRequired,
@@ -19,14 +19,32 @@ const properties = {
 class HeaderComponentPartial extends React.Component {
 	constructor(props) {
 		super(props);
-
 		this.on_register = this.on_register.bind(this);
 		this.on_login = this.on_login.bind(this);
+		this.on_logout = this.on_logout.bind(this)
 	}
 
 	// mounted
 	componentDidMount() {
-
+	}
+	
+	render_header_button() {
+		let auth = this.props.header.authorization;
+		console.log()
+		if(auth) {
+			return (
+				<div>
+					<antd.Button type="link" style={{ marginRight: 20, color: "#000" }} onClick={this.on_logout}>Logout</antd.Button>
+				</div>
+			)
+		} else {
+			return (
+				<div>
+					<antd.Button type="link" style={{ marginRight: 20, color: "#000" }} onClick={this.on_register}>Join</antd.Button>
+					<antd.Button type="link" style={{ color: "#000" }} onClick={this.on_login}>Log in</antd.Button>
+				</div>
+			)
+		}
 	}
 
 	// updating
@@ -48,6 +66,12 @@ class HeaderComponentPartial extends React.Component {
 		this.props.history.push("/login");
 	}
 
+	on_logout() {
+		console.log(this.props)
+		collection_helper.process_delete_all_item();
+		window.location.reload();
+	}
+
 	render() {
 		return (
 			<antd.Layout.Header style={{ background: "#FFF", borderBottom: "1px solid #00000010" }}>
@@ -58,11 +82,13 @@ class HeaderComponentPartial extends React.Component {
 							<span className="nectorflash-subtitle" style={{ color: "#000" }}>To Do's</span>
 						</span>
 					</div>
-
-					<div>
+					{
+						this.render_header_button()
+					}
+					{/* <div>
 						<antd.Button type="link" style={{ marginRight: 20, color: "#000" }} onClick={this.on_register}>Join</antd.Button>
 						<antd.Button type="link" style={{ color: "#000" }} onClick={this.on_login}>Log in</antd.Button>
-					</div>
+					</div> */}
 				</div>
 			</antd.Layout.Header>
 		);

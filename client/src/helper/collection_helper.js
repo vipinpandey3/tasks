@@ -204,6 +204,11 @@ class CollectionHelper {
 		return localStorage.getItem(key);
 	}
 
+	static process_delete_all_item(key) {
+		// eslint-disable-next-line no-undef
+		return localStorage.clear();
+	}
+
 	static process_delete_items() {
 		// eslint-disable-next-line no-undef
 		localStorage.removeItem(constant_helper.get_app_constant().TODO_AUTHORIZATION);
