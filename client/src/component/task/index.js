@@ -5,7 +5,9 @@ import constant_helper from '../../helper/constant_helper';
 import moment from 'moment';
 import UserContainer from '../../container/user';
 import TasksForm from '../../component_form/task_forms/task_creation_form';
-import * as antd from 'antd';
+import { notification, Table, Button, Form, Select, DatePicker } from 'antd';
+import * as antd from 'antd'
+import socket from '../../socket'; // Import the socket instance
 import { FormateDate, getCurrentDate } from "../../helper/date_helper";
 
 class TaskComponent extends React.Component {
@@ -21,7 +23,7 @@ class TaskComponent extends React.Component {
         title: '',
         description: '',
         status: 'To Do',
-        dueDate: getCurrentDate()
+        dueDate: getCurrentDate(),
       },
       filter: { limit: 10, offset: 0, status: '', dueDate: null },
       showDialogueBox: false,
@@ -48,6 +50,15 @@ class TaskComponent extends React.Component {
 
   componentDidMount() {
     this.load_tasks(this.state.filter);
+
+    // Listen for reminders
+    console.log("data", socket)
+    socket.on('reminder', (data) => {
+      notification.info({
+        message: 'Task Reminder',
+        description: data.message,
+      });
+    });
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -168,7 +179,7 @@ class TaskComponent extends React.Component {
       event: constant_helper.get_app_constant().API_CREATE_TASKS,
       endpoint: `user/update_task_status/${record.key}`,
       params: {
-        status: "Deleted"
+        status: 'Deleted',
       },
       has_authorization: true,
       headers: {
@@ -221,7 +232,7 @@ class TaskComponent extends React.Component {
         title: '',
         description: '',
         status: 'To Do',
-        dueDate: getCurrentDate()
+        dueDate: getCurrentDate(),
       },
       task_id: null,
     });
@@ -314,32 +325,31 @@ class TaskComponent extends React.Component {
     return (
       <div style={{ width: '80%', margin: '0 auto' }}>
         <UserContainer {...this.props} />
-        {
-          !this.state.show_task_creation_form && 
-          <antd.Form style={{marginTop: '10px'}} layout="inline" onValuesChange={this.handleFilterChange}>
-          <antd.Form.Item label="Status" name="status">
-            <antd.Select style={{ width: 120 }}>
-              <antd.Select.Option value="">All</antd.Select.Option>
-              <antd.Select.Option value="To Do">To Do</antd.Select.Option>
-              <antd.Select.Option value="In Progress">In Progress</antd.Select.Option>
-              <antd.Select.Option value="Done">Done</antd.Select.Option>
-            </antd.Select>
-          </antd.Form.Item>
-          <antd.Form.Item label="Due Date" name="dueDate">
-            <antd.DatePicker format="YYYY-MM-DD" />
-          </antd.Form.Item>
-          <antd.Form.Item>
-            <antd.Button type="primary" onClick={this.handleFilterSubmit}>
-              Filter
-            </antd.Button>
-          </antd.Form.Item>
-          <antd.Form.Item>
-            <antd.Button type="default" onClick={this.handleClearFilter}>
-              Clear Filter
-            </antd.Button>
-          </antd.Form.Item>
-        </antd.Form>
-        }
+        {!this.state.show_task_creation_form && (
+          <antd.Form style={{ marginTop: '10px' }} layout="inline" onValuesChange={this.handleFilterChange}>
+            <antd.Form.Item label="Status" name="status">
+              <antd.Select style={{ width: 120 }}>
+                <antd.Select.Option value="">All</antd.Select.Option>
+                <antd.Select.Option value="To Do">To Do</antd.Select.Option>
+                <antd.Select.Option value="In Progress">In Progress</antd.Select.Option>
+                <antd.Select.Option value="Done">Done</antd.Select.Option>
+              </antd.Select>
+            </antd.Form.Item>
+            <antd.Form.Item label="Due Date" name="dueDate">
+              <antd.DatePicker format="YYYY-MM-DD" />
+            </antd.Form.Item>
+            <antd.Form.Item>
+              <antd.Button type="primary" onClick={this.handleFilterSubmit}>
+                Filter
+              </antd.Button>
+            </antd.Form.Item>
+            <antd.Form.Item>
+              <antd.Button type="default" onClick={this.handleClearFilter}>
+                Clear Filter
+              </antd.Button>
+            </antd.Form.Item>
+          </antd.Form>
+        )}
         {this.state.show_task_creation_form && (
           <TasksForm formValue={this.state.formValue} on_finish={this.on_finish} on_cancel={this.handle_cancel} />
         )}

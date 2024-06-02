@@ -67,7 +67,6 @@ class HeaderComponentPartial extends React.Component {
 	}
 
 	on_logout() {
-		console.log(this.props)
 		collection_helper.process_delete_all_item();
 		window.location.reload();
 	}
